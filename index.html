@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T-Launcher</title>
+<style>
+  /* Reset margin/padding */
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background: #111827;
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<script>
+if (!document.getElementById('tlauncher-fullscreen')) {
+  const launcher = document.createElement('div');
+  launcher.id = 'tlauncher-fullscreen';
+  launcher.style = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-image: url('https://i.redd.it/cool-cinematic-shader-shots-v0-o235hlj3u9ab1.png?width=1190&format=png&auto=webp&s=ab7d21199427c7bcfe1159b610bf9e7d8780a639');
+    background-size: cover;
+    background-position: center;
+    z-index: 99999;
+    display: flex;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+  `;
+
+  const sidebar = document.createElement('div');
+  sidebar.style = `
+    width: 200px;
+    background: rgba(15, 23, 42, 0.9);
+    padding: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  `;
+
+  const tabs = ['Web Version', 'Modded', 'Hacked'];
+  let activeTab = 'Web Version';
+
+  const content = document.createElement('div');
+  content.style = `
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(17, 24, 39, 0.95);
+    border-radius: 0 20px 20px 0;
+    max-width: 600px;
+    margin: auto;
+  `;
+
+  const title = document.createElement('h1');
+  title.innerText = 'T-Launcher';
+  title.style = 'font-size: 36px; margin-bottom: 30px; color: #93c5fd;';
+  content.appendChild(title);
+
+  const select = document.createElement('select');
+  select.style = `
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    background-color: #1f2937;
+    color: white;
+    margin-bottom: 30px;
+  `;
+  content.appendChild(select);
+
+  const runButton = document.createElement('button');
+  runButton.innerText = '▶ Run';
+  runButton.style = `
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    background-color: #3b82f6;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+  `;
+  runButton.onmouseenter = () => runButton.style.background = '#2563eb';
+  runButton.onmouseleave = () => runButton.style.background = '#3b82f6';
+  content.appendChild(runButton);
+
+  const closeBtn = document.createElement('div');
+  closeBtn.innerText = '×';
+  closeBtn.style = `
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 40px;
+    color: white;
+    cursor: pointer;
+    z-index: 100000;
+  `;
+  closeBtn.onclick = () => launcher.remove();
+
+  const groups = {
+    'Web Version': {
+      '1.12.2': 'https://eaglercraft.com/mc/1.12.2-wasm/',
+      '1.8.8': 'https://eaglercraft.com/mc/1.8.8-wasm/',
+      'Alpha v1.2.6': 'https://eaglercraft.com/mc/a1.2.6/'
+    },
+    'Modded': {
+      'Astra Client': 'https://irv77.github.io/AmplerLauncher/mc/astraclient/',
+      'Eaglerforge': 'https://irv77.github.io/AmplerLauncher/mc/eaglerforge/',
+      'Resent Client': 'https://irv77.github.io/AmplerLauncher/mc/resentclient/',
+      'Shadow Client': 'https://irv77.github.io/AmplerLauncher/mc/shadowclient/',
+      'Starlike': 'https://irv77.github.io/AmplerLauncher/mc/starlikeclient/'
+    },
+    'Hacked': {
+      'UwUsense': 'https://html-classic.itch.zone/html/8891778/index.html'
+    }
+  };
+
+  function loadOptions(category) {
+    select.innerHTML = '';
+    for (const [name, url] of Object.entries(groups[category])) {
+      const option = document.createElement('option');
+      option.value = name;
+      option.innerText = name;
+      select.appendChild(option);
+    }
+  }
+
+  loadOptions(activeTab);
+
+  runButton.onclick = () => {
+    const selected = select.value;
+    const url = groups[activeTab][selected];
+    if (url) {
+      window.open(
+        url,
+        'Eaglercraft_' + selected.replace(/\s/g, '_'),
+        'width=1024,height=600,menubar=no,toolbar=no,resizable=yes,scrollbars=yes'
+      );
+    } else {
+      alert('No launch URL available for: ' + selected);
+    }
+  };
+
+  tabs.forEach(tabName => {
+    const tab = document.createElement('div');
+    tab.innerText = tabName;
+    tab.style = `
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: ${tabName === activeTab ? '#3b82f6' : 'transparent'};
+      color: ${tabName === activeTab ? 'white' : '#ccc'};
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    `;
+    tab.onclick = () => {
+      activeTab = tabName;
+      loadOptions(activeTab);
+      Array.from(sidebar.children).forEach(child => {
+        child.style.background = 'transparent';
+        child.style.color = '#ccc';
+      });
+      tab.style.background = '#3b82f6';
+      tab.style.color = 'white';
+    };
+    sidebar.appendChild(tab);
+  });
+
+  launcher.appendChild(sidebar);
+  launcher.appendChild(content);
+  launcher.appendChild(closeBtn);
+  document.body.appendChild(launcher);
+} else {
+  console.log('T-Launcher is already open.');
+}
+</script>
+
+</body>
+</html>
